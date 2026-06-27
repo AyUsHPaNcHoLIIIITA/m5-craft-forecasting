@@ -1,0 +1,8 @@
+CRAFT Stage 2: LightGBM DART Training Summary
+Horizons: 7
+Features: 29
+Train rows: 2939363
+Val rows: 874304
+Test rows: 867885
+Overall MASE: 2884.330752
+Overall RMSSE: 13.104232

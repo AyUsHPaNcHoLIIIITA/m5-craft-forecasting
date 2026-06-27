@@ -1,0 +1,20 @@
+# Raw Data
+calendar.csv
+sell_prices.csv
+sales_train_validation.csv
+sales_train_evaluation.csv
+sample_submission.csv
+
+# Cached Data
+outputs/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+craft_env/
+
+# IDEs
+.idea/
+.vscode/
+.DS_Store

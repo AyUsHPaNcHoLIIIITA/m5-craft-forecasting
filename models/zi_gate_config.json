@@ -1,0 +1,19 @@
+{
+  "zero_threshold": 1.0,
+  "temperature": 1.0,
+  "feature_names": [
+    "rolling_cv_7",
+    "rolling_cv_14",
+    "bb_width_14",
+    "trend_r2_14",
+    "rolling_mean_14",
+    "rolling_std_14",
+    "tft_pred",
+    "lgb_pred",
+    "pred_diff",
+    "pred_ratio",
+    "lgb_minus_tft",
+    "item_idx",
+    "store_idx"
+  ]
+}

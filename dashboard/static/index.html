@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRAFT Forecasting Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Control Panel (Sidebar) -->
+        <aside class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <h2>CRAFT</h2>
+                <p>Zero-Inflated Adaptive Gate</p>
+            </div>
+            
+            <form id="forecast-form">
+                <div class="form-group">
+                    <label for="item_id">Product</label>
+                    <select id="item_id" name="item_id" class="glass-input">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="store_id">Store</label>
+                    <select id="store_id" name="store_id" class="glass-input">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="start_date">Forecast Start Date</label>
+                    <select id="start_date" name="start_date" class="glass-input">
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="horizon">Forecast Horizon</label>
+                    <input type="range" id="horizon" name="horizon" min="1" max="7" value="7" class="glass-slider">
+                    <div class="slider-val"><span id="horizon-val">7</span> Days</div>
+                </div>
+                
+                <div class="form-group scenario-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="show-actuals" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="toggle-label">Show Actuals</span>
+                </div>
+                
+                <button type="submit" class="btn-glow" id="btn-generate">Generate Forecast</button>
+            </form>
+            
+            <div class="sidebar-footer">
+                <span class="data-note">Store: CA_1 · 3,049 items · May 2016</span>
+            </div>
+        </aside>
+
+        <!-- Main Canvas -->
+        <main class="canvas">
+            <!-- Context Card + KPIs -->
+            <div class="kpi-row">
+                <div class="kpi-card glass-panel context-card">
+                    <h3>Gate Context</h3>
+                    <div id="context-info" class="context-details">
+                        Select an item and click Generate to see how the model routes.
+                    </div>
+                </div>
+                <div class="kpi-card glass-panel">
+                    <h3>Total Expected</h3>
+                    <div class="kpi-value" id="kpi-total">--</div>
+                </div>
+                <div class="kpi-card glass-panel">
+                    <h3>Avg Daily</h3>
+                    <div class="kpi-value" id="kpi-avg">--</div>
+                </div>
+            </div>
+
+            <!-- Main Forecast Chart -->
+            <div class="chart-container glass-panel main-chart-wrapper">
+                <h3>Sales Trajectory</h3>
+                <div class="canvas-wrapper">
+                    <canvas id="forecastChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Routing Visualization -->
+            <div class="chart-container glass-panel routing-chart-wrapper">
+                <h3>Model Routing · Per-Day Gate Weights</h3>
+                <div class="canvas-wrapper">
+                    <canvas id="routingChart"></canvas>
+                </div>
+                <div class="routing-legend">
+                    <span class="legend-item"><span class="color-box tft-color"></span> TFT (Zero-Regime)</span>
+                    <span class="legend-item"><span class="color-box lgb-color"></span> LightGBM (Demand)</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
