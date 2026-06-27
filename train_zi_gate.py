@@ -363,25 +363,41 @@ def run_interpretability(test_merged, gate, ctx_cols):
     print("  Plotting fusion weights time-series…")
     fig, axes = plt.subplots(2, 1, figsize=(16, 8))
     
-    sample_items = test_merged["item_id"].value_counts().head(5).index.tolist()
+    # Pick items with the most weight variation (interesting routing behavior)
+    # instead of just the most frequent items (which are often all-zero regime)
+    item_weight_std = test_merged.groupby("item_id")["w_tft"].std().dropna()
+    # Among items with non-trivial variation, pick the top 5
+    varied_items = item_weight_std[item_weight_std > 0.01].nlargest(5).index.tolist()
+    # Fallback to most frequent if no varied items found
+    if len(varied_items) < 3:
+        varied_items = test_merged["item_id"].value_counts().head(5).index.tolist()
+    sample_items = varied_items
+    
     colors = ["#3498DB", "#E74C3C", "#2ECC71", "#9B59B6", "#F39C12"]
     
     for i, item in enumerate(sample_items):
-        sub = test_merged[test_merged["item_id"] == item].sort_values("time_idx")
-        axes[0].plot(sub["time_idx"], sub["w_tft"], label=item[:20], 
-                     alpha=0.7, linewidth=1, color=colors[i % len(colors)])
-        axes[1].plot(sub["time_idx"], sub["actual_sales"], label=item[:20],
-                     alpha=0.7, linewidth=1, color=colors[i % len(colors)])
+        # We know there are 7 days of predictions per item.
+        # Plot against a relative day index (1 to 7) instead of time_idx which is static for the forecast window
+        sub = test_merged[test_merged["item_id"] == item]
+        # In case there are duplicates or sorting issues, just take the first 7
+        days = list(range(1, len(sub) + 1))
+        
+        axes[0].plot(days, sub["w_tft"], label=item[:20], 
+                     alpha=0.7, linewidth=1.5, color=colors[i % len(colors)], marker='o', markersize=4)
+        axes[1].plot(days, sub["actual_sales"], label=item[:20],
+                     alpha=0.7, linewidth=1.5, color=colors[i % len(colors)], marker='o', markersize=4)
     
-    axes[0].set_title("Fusion Weight w_TFT Over Time (Top 5 Items)")
+    axes[0].set_title("Fusion Weight w_TFT Over Time (Items with Active Routing)")
     axes[0].set_ylabel("w_TFT")
+    axes[0].set_ylim(-0.05, 1.05)
     axes[0].legend(fontsize=7, ncol=2)
     axes[0].axhline(1.0, color="gray", linestyle="--", alpha=0.3)
     axes[0].axhline(0.5, color="gray", linestyle="--", alpha=0.3)
+    axes[0].axhline(0.0, color="gray", linestyle="--", alpha=0.3)
     
     axes[1].set_title("Actual Sales Over Time")
     axes[1].set_ylabel("Sales")
-    axes[1].set_xlabel("Time Index")
+    axes[1].set_xlabel("Forecast Horizon (Days)")
     axes[1].legend(fontsize=7, ncol=2)
     
     plt.tight_layout()
